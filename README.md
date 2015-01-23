@@ -1,6 +1,8 @@
 # twodict (Two Way Ordered Dict)
 Simple two way ordered dictionary for Python.
 
+See [wiki](https://github.com/MrS0m30n3/twodict/wiki) for more informations.
+
 # INSTALLATION
 sudo python setup.py install
 
