@@ -6,6 +6,8 @@ See [wiki](https://github.com/MrS0m30n3/twodict/wiki) for more informations.
 # INSTALLATION
 sudo python setup.py install
 
+twodict is also available via [Pypi](https://pypi.python.org/pypi/twodict)
+
 # USAGE
 ```python
 from twodict import TwoWayOrderedDict
