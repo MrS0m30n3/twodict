@@ -4,9 +4,14 @@ Simple two way ordered dictionary for Python.
 See [wiki](https://github.com/MrS0m30n3/twodict/wiki) for more informations.
 
 # INSTALLATION
-sudo python setup.py install
 
-twodict is also available via [Pypi](https://pypi.python.org/pypi/twodict)
+### Install From Source
+1. Download & extract source from [here](https://github.com/MrS0m30n3/twodict/archive/1.0.zip)
+2. Change directory into **twodict-1.0/**
+3. Run `sudo python setup.py install`
+
+### Install From [Pypi](https://pypi.python.org/pypi/twodict)
+1. Run `sudo pip install youtube-dlg`
 
 # USAGE
 ```python
