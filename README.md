@@ -11,7 +11,7 @@ See [wiki](https://github.com/MrS0m30n3/twodict/wiki) for more informations.
 3. Run `sudo python setup.py install`
 
 ### Install From [Pypi](https://pypi.python.org/pypi/twodict)
-1. Run `sudo pip install youtube-dlg`
+1. Run `sudo pip install twodict`
 
 # USAGE
 ```python
