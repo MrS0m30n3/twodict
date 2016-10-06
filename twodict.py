@@ -6,7 +6,56 @@ Attributes:
 
 """
 
+import collections
+
 _RANDOM_OBJECT = object()
+
+
+########## Objects to mimic Python3 view objects ##########
+# See: https://docs.python.org/3/library/stdtypes.html#dict-views
+
+class DictKeysView(collections.KeysView):
+
+    def __init__(self, data):
+        super(DictKeysView, self).__init__(data)
+        self.__data = data
+
+    def _get_keys(self):
+        return [key for key in self.__data]
+
+    def __repr__(self):
+        return "dict_keys({data})".format(data=self._get_keys())
+
+
+class DictValuesView(collections.ValuesView):
+
+    def __init__(self, data):
+        super(DictValuesView, self).__init__(data)
+        self.__data = data
+
+    def _get_values(self):
+        return [self.__data[key] for key in self.__data]
+
+    def __repr__(self):
+        return "dict_values({data})".format(data=self._get_values())
+
+
+class DictItemsView(collections.ItemsView):
+
+    def __init__(self, data):
+        super(DictItemsView, self).__init__(data)
+        self.__data = data
+
+    def _get_items(self):
+        return [(key, self.__data[key]) for key in self.__data]
+
+    def __repr__(self):
+        return "dict_items({data})".format(data=self._get_items())
+
+    def __contains__(self, item):
+        return item in self._get_items()
+
+###########################################################
 
 
 class TwoWayOrderedDict(dict):

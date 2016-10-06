@@ -6,7 +6,12 @@ import sys
 import unittest
 
 try:
-    from twodict import TwoWayOrderedDict
+    from twodict import (
+        TwoWayOrderedDict,
+        DictItemsView,
+        DictValuesView,
+        DictKeysView
+    )
 except ImportError as error:
     print(error)
     sys.exit(1)
@@ -282,6 +287,84 @@ class TestClear(unittest.TestCase):
         tdict = TwoWayOrderedDict(a=1, b=2, c=3)
         tdict.clear()
         self.assertEqual(len(tdict), 0)
+
+
+########## DictViews section ##########
+
+
+class TestDictKeysView(unittest.TestCase):
+
+    """Contains all the test cases for the DictKeysView object."""
+
+    def setUp(self):
+        self.tdict = TwoWayOrderedDict([('a', 1), ('b', 2)])
+
+        self.keys_view = DictKeysView(self.tdict)
+        self.keys = ['a', 'b']
+
+    def test_length(self):
+        self.assertEqual(len(self.keys_view), len(self.keys))
+
+    def test_iter(self):
+        for index, key in enumerate(self.keys_view):
+            self.assertEqual(key, self.keys[index])
+
+    def test_contains(self):
+        self.assertIn('a', self.keys_view)
+        self.assertNotIn('c', self.keys_view)
+
+    def test_repr(self):
+        self.assertEqual(repr(self.keys_view), "dict_keys(['a', 'b'])")
+
+
+class TestDictValuesView(unittest.TestCase):
+
+    """Contains all the test cases for the DictValuesView object."""
+
+    def setUp(self):
+        self.tdict = TwoWayOrderedDict([('a', 1), ('b', 2)])
+
+        self.values_view = DictValuesView(self.tdict)
+        self.values = [1, 2]
+
+    def test_length(self):
+        self.assertEqual(len(self.values_view), len(self.values))
+
+    def test_iter(self):
+        for index, value in enumerate(self.values_view):
+            self.assertEqual(value, self.values[index])
+
+    def test_contains(self):
+        self.assertIn(1, self.values_view)
+        self.assertNotIn(3, self.values_view)
+
+    def test_repr(self):
+        self.assertEqual(repr(self.values_view), "dict_values([1, 2])")
+
+
+class TestDictItemsView(unittest.TestCase):
+
+    """Contains all the test cases for the DictItemsView object."""
+
+    def setUp(self):
+        self.tdict = TwoWayOrderedDict([('a', 1), ('b', 2)])
+
+        self.items_view = DictItemsView(self.tdict)
+        self.items = [('a', 1), ('b', 2)]
+
+    def test_length(self):
+        self.assertEqual(len(self.items_view), len(self.items))
+
+    def test_iter(self):
+        for index, item in enumerate(self.items_view):
+            self.assertEqual(item, self.items[index])
+
+    def test_contains(self):
+        self.assertIn(('a', 1), self.items_view)
+        self.assertNotIn('a', self.items_view)
+
+    def test_repr(self):
+        self.assertEqual(repr(self.items_view), "dict_items([('a', 1), ('b', 2)])")
 
 
 def main():
