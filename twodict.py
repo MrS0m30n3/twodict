@@ -162,7 +162,7 @@ class TwoWayOrderedDict(dict):
             curr = curr[self._PREV]
 
     def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, self.items())
+        return '%s(%r)' % (self.__class__.__name__, list(self.items()))
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
