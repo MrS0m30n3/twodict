@@ -20,11 +20,11 @@ class DictKeysView(collections.KeysView):
         super(DictKeysView, self).__init__(data)
         self.__data = data
 
-    def _get_keys(self):
-        return [key for key in self.__data]
-
     def __repr__(self):
-        return "dict_keys({data})".format(data=self._get_keys())
+        return "dict_keys({data})".format(data=list(self))
+
+    def __contains__(self, key):
+        return key in [key for key in self.__data]
 
 
 class DictValuesView(collections.ValuesView):
@@ -33,11 +33,11 @@ class DictValuesView(collections.ValuesView):
         super(DictValuesView, self).__init__(data)
         self.__data = data
 
-    def _get_values(self):
-        return [self.__data[key] for key in self.__data]
-
     def __repr__(self):
-        return "dict_values({data})".format(data=self._get_values())
+        return "dict_values({data})".format(data=list(self))
+
+    def __contains__(self, value):
+        return value in [self.__data[key] for key in self.__data]
 
 
 class DictItemsView(collections.ItemsView):
@@ -46,14 +46,11 @@ class DictItemsView(collections.ItemsView):
         super(DictItemsView, self).__init__(data)
         self.__data = data
 
-    def _get_items(self):
-        return [(key, self.__data[key]) for key in self.__data]
-
     def __repr__(self):
-        return "dict_items({data})".format(data=self._get_items())
+        return "dict_items({data})".format(data=list(self))
 
     def __contains__(self, item):
-        return item in self._get_items()
+        return item in [(key, self.__data[key]) for key in self.__data]
 
 ###########################################################
 

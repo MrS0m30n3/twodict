@@ -366,7 +366,7 @@ class TestDictKeysView(unittest.TestCase):
 
     def test_contains(self):
         self.assertIn('a', self.keys_view)
-        self.assertNotIn('c', self.keys_view)
+        self.assertNotIn(1, self.keys_view)
 
     def test_repr(self):
         self.assertEqual(repr(self.keys_view), "dict_keys(['a', 'b'])")
@@ -391,7 +391,7 @@ class TestDictValuesView(unittest.TestCase):
 
     def test_contains(self):
         self.assertIn(1, self.values_view)
-        self.assertNotIn(3, self.values_view)
+        self.assertNotIn('a', self.values_view)
 
     def test_repr(self):
         self.assertEqual(repr(self.values_view), "dict_values([1, 2])")
@@ -417,6 +417,8 @@ class TestDictItemsView(unittest.TestCase):
     def test_contains(self):
         self.assertIn(('a', 1), self.items_view)
         self.assertNotIn('a', self.items_view)
+        self.assertNotIn(1, self.items_view)
+        self.assertNotIn(('a', 10), self.items_view)
 
     def test_repr(self):
         self.assertEqual(repr(self.items_view), "dict_items([('a', 1), ('b', 2)])")
