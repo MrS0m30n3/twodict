@@ -183,7 +183,7 @@ class TwoWayOrderedDict(dict):
         """Load items into our dictionary. """
         for item in args:
             if type(item) == dict:
-                item = item.iteritems()
+                item = item.items()
 
             for key, value in item:
                 self[key] = value

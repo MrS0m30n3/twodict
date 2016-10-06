@@ -16,17 +16,20 @@ except ImportError as error:
     print(error)
     sys.exit(1)
 
+########## Helpers ##########
+
 # Lambda to make a call to the parent of the given object
 super_call = lambda obj, method: getattr(super(obj.__class__, obj), method)()
 
 
-########## Helpers ##########
-
 class ExtraAssertions(object):
 
     def assertViewEqual(self, view, iterable):
-        if list(view) != iterable:
-            raise AssertionError("View is not equal to the given iterable")
+        view_list = list(view)
+
+        for item in view_list:
+            if item not in iterable:
+                raise AssertionError("View: {0} is not equal to the given iterable".format(view_list))
 
 #############################
 
@@ -107,7 +110,7 @@ class TestSetItem(unittest.TestCase, ExtraAssertions):
         tdict['c'] = 'b'
         self.assertViewEqual(tdict.items(), [('c', 'b'), ('d', 4)])
 
-        self.assertEqual(super_call(tdict, "__repr__"), "{'b': 'c', 4: 'd', 'd': 4, 'c': 'b'}")
+        self.assertEqual(super_call(tdict, "copy"), {'b': 'c', 4: 'd', 'd': 4, 'c': 'b'})
 
 
 class TestDelItem(unittest.TestCase, ExtraAssertions):
