@@ -20,21 +20,32 @@ except ImportError as error:
 super_call = lambda obj, method: getattr(super(obj.__class__, obj), method)()
 
 
-class TestInit(unittest.TestCase):
+########## Helpers ##########
+
+class ExtraAssertions(object):
+
+    def assertViewEqual(self, view, iterable):
+        if list(view) != iterable:
+            raise AssertionError("View is not equal to the given iterable")
+
+#############################
+
+
+class TestInit(unittest.TestCase, ExtraAssertions):
 
     """Test case for the TwoWayOrderedDict initialization."""
 
     def test_init_ordered(self):
         tdict = TwoWayOrderedDict([('a', 1), ('b', 2), ('c', 3)])
-        self.assertEqual(tdict.items(), [('a', 1), ('b', 2), ('c', 3)])
+        self.assertViewEqual(tdict.items(), [('a', 1), ('b', 2), ('c', 3)])
 
     def test_init_unordered_kwargs(self):
         tdict = TwoWayOrderedDict(a=1, b=2, c=3)
-        self.assertEqual(tdict.items(), [('a', 1), ('c', 3), ('b', 2)])
+        self.assertViewEqual(tdict.items(), [('a', 1), ('c', 3), ('b', 2)])
 
     def test_init_unordered_dict(self):
         tdict = TwoWayOrderedDict({'a': 1, 'b': 2, 'c': 3})
-        self.assertEqual(tdict.items(), [('a', 1), ('c', 3), ('b', 2)])
+        self.assertViewEqual(tdict.items(), [('a', 1), ('c', 3), ('b', 2)])
 
 
 class TestGetItem(unittest.TestCase):
@@ -54,7 +65,7 @@ class TestGetItem(unittest.TestCase):
         self.assertRaises(KeyError, self.tdict.__getitem__, 'd')
 
 
-class TestSetItem(unittest.TestCase):
+class TestSetItem(unittest.TestCase, ExtraAssertions):
 
     """Test case for the TwoWayOrderedDict __setitem__ method."""
 
@@ -63,43 +74,43 @@ class TestSetItem(unittest.TestCase):
 
     def test_set_item(self):
         self.tdict['c'] = 3
-        self.assertEqual(self.tdict.items(), [('a', 1), ('b', 2), ('c', 3)])
+        self.assertViewEqual(self.tdict.items(), [('a', 1), ('b', 2), ('c', 3)])
 
     def test_set_item_already_in_dict(self):
         self.tdict['a'] = 10
-        self.assertEqual(self.tdict.items(), [('a', 10), ('b', 2)])
+        self.assertViewEqual(self.tdict.items(), [('a', 10), ('b', 2)])
 
     def test_set_item_overwrite_value_as_key(self):
         self.tdict[1] = 'a'
-        self.assertEqual(self.tdict.items(), [('b', 2), (1, 'a')])
+        self.assertViewEqual(self.tdict.items(), [('b', 2), (1, 'a')])
 
     def test_set_item_overwrite_use_value_with_new_key(self):
         self.tdict['c'] = 1
-        self.assertEqual(self.tdict.items(), [('b', 2), ('c', 1)])
+        self.assertViewEqual(self.tdict.items(), [('b', 2), ('c', 1)])
 
     def test_set_item_key_equals_value(self):
         self.tdict['c'] = 'c'
-        self.assertEqual(self.tdict.items(), [('a', 1), ('b', 2), ('c', 'c')])
+        self.assertViewEqual(self.tdict.items(), [('a', 1), ('b', 2), ('c', 'c')])
 
         self.tdict['d'] = 4
-        self.assertEqual(self.tdict.items(), [('a', 1), ('b', 2), ('c', 'c'), ('d', 4)])
+        self.assertViewEqual(self.tdict.items(), [('a', 1), ('b', 2), ('c', 'c'), ('d', 4)])
 
     def test_set_item_overwrite_advanced(self):
         tdict = TwoWayOrderedDict([('a', 1), ('b', 2), ('c', 'c'), ('d', 4)])
 
         tdict['c'] = 3
-        self.assertEqual(tdict.items(), [('a', 1), ('b', 2), ('c', 3), ('d', 4)])
+        self.assertViewEqual(tdict.items(), [('a', 1), ('b', 2), ('c', 3), ('d', 4)])
 
         tdict['c'] = 1
-        self.assertEqual(tdict.items(), [('b', 2), ('c', 1), ('d', 4)])
+        self.assertViewEqual(tdict.items(), [('b', 2), ('c', 1), ('d', 4)])
 
         tdict['c'] = 'b'
-        self.assertEqual(tdict.items(), [('c', 'b'), ('d', 4)])
+        self.assertViewEqual(tdict.items(), [('c', 'b'), ('d', 4)])
 
         self.assertEqual(super_call(tdict, "__repr__"), "{'b': 'c', 4: 'd', 'd': 4, 'c': 'b'}")
 
 
-class TestDelItem(unittest.TestCase):
+class TestDelItem(unittest.TestCase, ExtraAssertions):
 
     """Test case for the TwoWayOrderedDict __delitem__ method."""
 
@@ -108,18 +119,18 @@ class TestDelItem(unittest.TestCase):
 
     def test_del_item_by_key(self):
         del self.tdict['a']
-        self.assertEqual(self.tdict.items(), [('b', 'b'), ('c', 3)])
+        self.assertViewEqual(self.tdict.items(), [('b', 'b'), ('c', 3)])
 
     def test_del_item_by_value(self):
         del self.tdict[3]
-        self.assertEqual(self.tdict.items(), [('a', 1), ('b', 'b')])
+        self.assertViewEqual(self.tdict.items(), [('a', 1), ('b', 'b')])
 
     def test_del_item_not_exist(self):
         self.assertRaises(KeyError, self.tdict.__delitem__, 'd')
 
     def test_del_item_key_equals_value(self):
         del self.tdict['b']
-        self.assertEqual(self.tdict.items(), [('a', 1), ('c', 3)])
+        self.assertViewEqual(self.tdict.items(), [('a', 1), ('c', 3)])
 
 
 class TestLength(unittest.TestCase):
@@ -172,7 +183,7 @@ class TestComparison(unittest.TestCase):
         self.assertNotEqual(t1, t2)
 
 
-class TestGetValuesAndKeys(unittest.TestCase):
+class TestGetValuesAndKeys(unittest.TestCase, ExtraAssertions):
 
     """Test case for the TwoWayOrderedDict values() & keys() methods."""
 
@@ -181,16 +192,16 @@ class TestGetValuesAndKeys(unittest.TestCase):
         self.tdict_not_empty = TwoWayOrderedDict([('a', 1), ('b', 2), ('c', 3)])
 
     def test_get_keys_empty(self):
-        self.assertEqual(self.tdict_empty.keys(), [])
+        self.assertViewEqual(self.tdict_empty.keys(), [])
 
     def test_get_keys_not_empty(self):
-        self.assertEqual(self.tdict_not_empty.keys(), ['a', 'b', 'c'])
+        self.assertViewEqual(self.tdict_not_empty.keys(), ['a', 'b', 'c'])
 
     def test_get_values_empty(self):
-        self.assertEqual(self.tdict_empty.values(), [])
+        self.assertViewEqual(self.tdict_empty.values(), [])
 
     def test_get_values_not_empty(self):
-        self.assertEqual(self.tdict_not_empty.values(), [1, 2, 3])
+        self.assertViewEqual(self.tdict_not_empty.values(), [1, 2, 3])
 
 
 class TestPopMethods(unittest.TestCase):
@@ -224,7 +235,7 @@ class TestPopMethods(unittest.TestCase):
         self.assertRaises(KeyError, self.tdict.popitem)
 
 
-class TestUpdate(unittest.TestCase):
+class TestUpdate(unittest.TestCase, ExtraAssertions):
 
     """Test case for the TwoWayOrderedDict update method."""
 
@@ -233,14 +244,14 @@ class TestUpdate(unittest.TestCase):
 
     def test_update_ordered(self):
         self.tdict.update([('a', 10), ('c', 3), ('d', 4), ('e', 5)])
-        self.assertEqual(self.tdict.items(), [('a', 10), ('b', 2), ('c', 3), ('d', 4), ('e', 5)])
+        self.assertViewEqual(self.tdict.items(), [('a', 10), ('b', 2), ('c', 3), ('d', 4), ('e', 5)])
 
     def test_update_unordered(self):
         self.tdict.update({'a': 10, 'c': 3, 'd': 4, 'e': 5})
-        self.assertEqual(self.tdict.items(), [('a', 10), ('b', 2), ('c', 3), ('e', 5), ('d', 4)])
+        self.assertViewEqual(self.tdict.items(), [('a', 10), ('b', 2), ('c', 3), ('e', 5), ('d', 4)])
 
 
-class TestSetDefault(unittest.TestCase):
+class TestSetDefault(unittest.TestCase, ExtraAssertions):
 
     """Test case for the TwoWayOrderedDict setdefault method."""
 
@@ -257,7 +268,7 @@ class TestSetDefault(unittest.TestCase):
         self.assertIsNone(self.tdict.setdefault('c'))
         self.assertEqual(self.tdict.setdefault('d', 'd'), 'd')
 
-        self.assertEqual(self.tdict.items(), [('a', 1), ('b', 2), ('c', None), ('d', 'd')])
+        self.assertViewEqual(self.tdict.items(), [('a', 1), ('b', 2), ('c', None), ('d', 'd')])
 
 
 class TestCopy(unittest.TestCase):
@@ -287,6 +298,47 @@ class TestClear(unittest.TestCase):
         tdict = TwoWayOrderedDict(a=1, b=2, c=3)
         tdict.clear()
         self.assertEqual(len(tdict), 0)
+
+
+class TestOldMethods(unittest.TestCase):
+
+    """Contains test cases for the deprecated methods.
+
+    Deprecated methods:
+        iteritems(): Replaced by items().
+
+        iterkeys(): Replaced by keys().
+
+        itervalues(): Replaced by values().
+
+        viewitems(): Replaced by items().
+
+        viewkeys(): Replaced by keys().
+
+        viewvalues(): Replaced by values().
+
+    """
+
+    def setUp(self):
+        self.tdict = TwoWayOrderedDict()
+
+    def test_iteritems_raises(self):
+        self.assertRaises(NotImplementedError, self.tdict.iteritems)
+
+    def test_iterkeys_raises(self):
+        self.assertRaises(NotImplementedError, self.tdict.iterkeys)
+
+    def test_itervalues_raises(self):
+        self.assertRaises(NotImplementedError, self.tdict.itervalues)
+
+    def test_viewitems_raises(self):
+        self.assertRaises(NotImplementedError, self.tdict.viewitems)
+
+    def test_viewkeys_raises(self):
+        self.assertRaises(NotImplementedError, self.tdict.viewkeys)
+
+    def test_viewvalues_raises(self):
+        self.assertRaises(NotImplementedError, self.tdict.viewvalues)
 
 
 ########## DictViews section ##########

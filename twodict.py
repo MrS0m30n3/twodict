@@ -11,7 +11,7 @@ import collections
 _RANDOM_OBJECT = object()
 
 
-########## Objects to mimic Python3 view objects ##########
+########## Custom views to mimic Python3 view objects ##########
 # See: https://docs.python.org/3/library/stdtypes.html#dict-views
 
 class DictKeysView(collections.KeysView):
@@ -192,13 +192,13 @@ class TwoWayOrderedDict(dict):
             self[key] = value
 
     def items(self):
-        return [(key, self[key]) for key in self]
+        return DictItemsView(self)
 
     def values(self):
-        return [self[key] for key in self]
+        return DictValuesView(self)
 
     def keys(self):
-        return list(self)
+        return DictKeysView(self)
 
     def pop(self, key, default=_RANDOM_OBJECT):
         try:
@@ -258,3 +258,9 @@ class TwoWayOrderedDict(dict):
         self._items += [item, None, item]
         self._items_map = {}
         dict.clear(self)
+
+    @staticmethod
+    def __not_implemented():
+        raise NotImplementedError("Please use the equivalent items(), keys(), values() methods")
+
+    iteritems = iterkeys = itervalues = viewitems = viewkeys = viewvalues = __not_implemented
