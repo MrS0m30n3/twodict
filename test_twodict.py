@@ -16,13 +16,12 @@ except ImportError as error:
     print(error)
     sys.exit(1)
 
+
 ########## Helpers ##########
 
-# Lambda to make a call to the parent of the given object
-super_call = lambda obj, method: getattr(super(obj.__class__, obj), method)()
-
-
 class ExtraAssertions(object):
+
+    MSG = "View: {0} is not equal to the given iterable"
 
     def assertViewEqualU(self, view, iterable):
         """Compare the given view with iterable. Order does NOT count."""
@@ -30,14 +29,14 @@ class ExtraAssertions(object):
 
         for item in view_list:
             if item not in iterable:
-                raise AssertionError("View: {0} is not equal to the given iterable".format(view_list))
+                raise AssertionError(self.MSG.format(view_list))
 
     def assertViewEqualO(self, view, iterable):
         """Compare the given view with iterable. Order does count."""
         view_list = list(view)
 
         if view_list != iterable:
-            raise AssertionError("View: {0} is not equal to the given iterable".format(view_list))
+            raise AssertionError(self.MSG.format(view_list))
 
 #############################
 
@@ -80,7 +79,8 @@ class TestSetItem(unittest.TestSuite):
 
     """Test suite for the TwoWayOrderedDict __setitem__ method.
 
-    Groups together all the test cases to organize the code better.
+    Groups together all the test cases for the __setitem__ method
+    to organize the code better.
 
     Test cases are based on the following table:
 
@@ -102,6 +102,8 @@ class TestSetItem(unittest.TestSuite):
             TestValueExistAsBoth: (1, 4), (2, 4), (3, 4), (4, 4)
 
     """
+
+    TEST_CASES_COUNT = 16
 
     class TestValueNotExist(unittest.TestCase, ExtraAssertions):
 
@@ -254,15 +256,14 @@ class TestSetItem(unittest.TestSuite):
             # Overwrite the tearDown method for each test case
             test_case.tearDown = self.tearDownForTestCases
 
-            tests = test_loader.loadTestsFromTestCase(test_case)
-            self.addTests(tests)
+            self.addTests(test_loader.loadTestsFromTestCase(test_case))
 
-        assert self.countTestCases() == 16
+        assert self.countTestCases() == self.TEST_CASES_COUNT
 
     @staticmethod
     def tearDownForTestCases(test_case):
         """Test the status of the parent dictionary."""
-        current_dict = super_call(test_case.tdict, "copy")
+        current_dict = super(test_case.tdict.__class__, test_case.tdict).copy()
         expected_dict = test_case.expected_dict
 
         test_case.assertEqual(current_dict, expected_dict)
@@ -346,20 +347,20 @@ class TestGetValuesAndKeys(unittest.TestCase, ExtraAssertions):
     """Test case for the TwoWayOrderedDict values() & keys() methods."""
 
     def setUp(self):
+        self.tdict = TwoWayOrderedDict([('a', 1), ('b', 2), ('c', 3)])
         self.tdict_empty = TwoWayOrderedDict()
-        self.tdict_not_empty = TwoWayOrderedDict([('a', 1), ('b', 2), ('c', 3)])
 
     def test_get_keys_empty(self):
         self.assertViewEqualO(self.tdict_empty.keys(), [])
 
     def test_get_keys_not_empty(self):
-        self.assertViewEqualO(self.tdict_not_empty.keys(), ['a', 'b', 'c'])
+        self.assertViewEqualO(self.tdict.keys(), ['a', 'b', 'c'])
 
     def test_get_values_empty(self):
         self.assertViewEqualO(self.tdict_empty.values(), [])
 
     def test_get_values_not_empty(self):
-        self.assertViewEqualO(self.tdict_not_empty.values(), [1, 2, 3])
+        self.assertViewEqualO(self.tdict.values(), [1, 2, 3])
 
 
 class TestPopMethods(unittest.TestCase):
@@ -380,7 +381,6 @@ class TestPopMethods(unittest.TestCase):
 
     def test_pop_with_default_value(self):
         self.assertIsNone(self.tdict.pop('d', None))
-        self.assertEqual(self.tdict.pop('d', 10), 10)
 
     def test_popitem_last(self):
         self.assertEqual(self.tdict.popitem(), ('c', 3))
@@ -389,7 +389,8 @@ class TestPopMethods(unittest.TestCase):
         self.assertEqual(self.tdict.popitem(last=False), ('a', 1))
 
     def test_popitem_raises(self):
-        for _ in range(len(self.tdict)): self.tdict.popitem()
+        while self.tdict: self.tdict.popitem()
+
         self.assertRaises(KeyError, self.tdict.popitem)
 
 
@@ -619,11 +620,13 @@ def all_tests_suite():
 
 
 def main():
-    verbosity_lvl = 2 if "-v" in sys.argv else 1
-    failfast_status = True if "-f" in sys.argv else False
+    verb_lvl = 2 if "-v" in sys.argv else 1
+    failfast_sts = True if "-f" in sys.argv else False
 
-    runner = unittest.TextTestRunner(verbosity=verbosity_lvl, failfast=failfast_status)
+    runner = unittest.TextTestRunner(verbosity=verb_lvl, failfast=failfast_sts)
     runner.run(all_tests_suite())
+
+    #unittest.main()
 
 
 if __name__ == "__main__":
