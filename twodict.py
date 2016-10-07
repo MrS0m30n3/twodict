@@ -232,6 +232,9 @@ class TwoWayOrderedDict(dict):
         return key, value
 
     def update(self, *args, **kwargs):
+        if len(args) > 1:
+            raise TypeError("expected at most 1 arguments, got {0}".format(len(args)))
+
         for item in args:
             if type(item) == dict:
                 item = item.items()

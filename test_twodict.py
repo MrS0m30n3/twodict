@@ -409,6 +409,9 @@ class TestUpdate(unittest.TestCase, ExtraAssertions):
         self.tdict.update({'a': 10, 'c': 3, 'd': 4, 'e': 5})
         self.assertViewEqualU(self.tdict.items(), [('a', 10), ('b', 2), ('c', 3), ('e', 5), ('d', 4)])
 
+    def test_update_raises(self):
+        self.assertRaises(TypeError, self.tdict.update, [('a', 10)], [('b', 20)])
+
 
 class TestSetDefault(unittest.TestCase, ExtraAssertions):
 
