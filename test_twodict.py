@@ -76,49 +76,196 @@ class TestGetItem(unittest.TestCase):
         self.assertRaises(KeyError, self.tdict.__getitem__, 'd')
 
 
-class TestSetItem(unittest.TestCase, ExtraAssertions):
+class TestSetItem(unittest.TestSuite):
 
-    """Test case for the TwoWayOrderedDict __setitem__ method."""
+    """Test suite for the TwoWayOrderedDict __setitem__ method.
 
-    def setUp(self):
-        self.tdict = TwoWayOrderedDict([('a', 1), ('b', 2)])
+    Groups together all the test cases to organize the code better.
 
-    def test_set_item(self):
-        self.tdict['c'] = 3
-        self.assertViewEqualO(self.tdict.items(), [('a', 1), ('b', 2), ('c', 3)])
+    Test cases are based on the following table:
 
-    def test_set_item_already_in_dict(self):
-        self.tdict['a'] = 10
-        self.assertViewEqualO(self.tdict.items(), [('a', 10), ('b', 2)])
+        .-------.-----------.--------.----------.---------.
+        |       | Not Exist | As Key | As Value | As Both |
+        :-------+-----------+--------+----------+---------:
+        | key   |         1 |      2 |        3 |       4 |
+        :-------+-----------+--------+----------+---------:
+        | value |         1 |      2 |        3 |       4 |
+        '-------'-----------'--------'----------'---------'
 
-    def test_set_item_overwrite_value_as_key(self):
-        self.tdict[1] = 'a'
-        self.assertViewEqualO(self.tdict.items(), [('b', 2), (1, 'a')])
+        Available permutations for n=4: n*n => 4*4 = 16 (test-cases)
 
-    def test_set_item_overwrite_use_value_with_new_key(self):
-        self.tdict['c'] = 1
-        self.assertViewEqualO(self.tdict.items(), [('b', 2), ('c', 1)])
+        Test cases details:
 
-    def test_set_item_key_equals_value(self):
-        self.tdict['c'] = 'c'
-        self.assertViewEqualO(self.tdict.items(), [('a', 1), ('b', 2), ('c', 'c')])
+            TestValueNotExist: (1, 1), (2, 1), (3, 1), (4, 1)
+            TestValueExistAsKey: (1, 2), (2, 2), (3, 2), (4, 2)
+            TestValueExistAsValue: (1, 3), (2, 3), (3, 3), (4, 3)
+            TestValueExistAsBoth: (1, 4), (2, 4), (3, 4), (4, 4)
 
-        self.tdict['d'] = 4
-        self.assertViewEqualO(self.tdict.items(), [('a', 1), ('b', 2), ('c', 'c'), ('d', 4)])
+    """
 
-    def test_set_item_overwrite_advanced(self):
-        tdict = TwoWayOrderedDict([('a', 1), ('b', 2), ('c', 'c'), ('d', 4)])
+    class TestValueNotExist(unittest.TestCase, ExtraAssertions):
 
-        tdict['c'] = 3
-        self.assertViewEqualO(tdict.items(), [('a', 1), ('b', 2), ('c', 3), ('d', 4)])
+        def setUp(self):
+            self.tdict = TwoWayOrderedDict([('a', 1), ('b', 'b')])
+            self.value = 3
 
-        tdict['c'] = 1
-        self.assertViewEqualO(tdict.items(), [('b', 2), ('c', 1), ('d', 4)])
+            # Hold the expected dict for each test case. Used on tearDown
+            self.expected_dict = {}
 
-        tdict['c'] = 'b'
-        self.assertViewEqualO(tdict.items(), [('c', 'b'), ('d', 4)])
+        def test_set_item_key_not_exist(self):
+            self.tdict['c'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('a', 1), ('b', 'b'), ('c', 3)])
 
-        self.assertEqual(super_call(tdict, "copy"), {'b': 'c', 4: 'd', 'd': 4, 'c': 'b'})
+            self.expected_dict = {'a': 1, 1: 'a', 'b': 'b', 'c': 3, 3: 'c'}
+
+        def test_set_item_key_exist_as_key(self):
+            self.tdict['a'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('a', 3), ('b', 'b')])
+
+            self.expected_dict = {'a': 3, 3: 'a', 'b': 'b'}
+
+        def test_set_item_key_exist_as_value(self):
+            self.tdict[1] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('b', 'b'), (1, 3)])
+
+            self.expected_dict = {'b': 'b', 1: 3, 3: 1}
+
+        def test_set_item_key_exist_as_both(self):
+            self.tdict['b'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('a', 1), ('b', 3)])
+
+            self.expected_dict = {'a': 1, 1: 'a', 'b': 3, 3: 'b'}
+
+
+    class TestValueExistAsKey(unittest.TestCase, ExtraAssertions):
+
+        def setUp(self):
+            self.tdict = TwoWayOrderedDict([('a', 1), ('b', 'b'), ('c', 3)])
+            self.value = 'a'
+
+            # Hold the expected dict for each test case. Used on tearDown
+            self.expected_dict = {}
+
+        def test_set_item_key_not_exist(self):
+            self.tdict['d'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('b', 'b'), ('c', 3), ('d', 'a')])
+
+            self.expected_dict = {'b': 'b', 'c': 3, 3: 'c', 'd': 'a', 'a': 'd'}
+
+        def test_set_item_key_exist_as_key(self):
+            self.tdict['a'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('a', 'a'), ('b', 'b'), ('c', 3)])
+
+            self.expected_dict = {'a': 'a', 'b': 'b', 'c': 3, 3: 'c'}
+
+        def test_set_item_key_exist_as_value(self):
+            self.tdict[1] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('b', 'b'), ('c', 3), (1, 'a')])
+
+            self.expected_dict = {'b': 'b', 'c': 3, 3: 'c', 1: 'a', 'a': 1}
+
+        def test_set_item_key_exist_as_both(self):
+            self.tdict['b'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('b', 'a'), ('c', 3)])
+
+            self.expected_dict = {'b': 'a', 'a': 'b', 'c': 3, 3: 'c'}
+
+
+    class TestValueExistAsValue(unittest.TestCase, ExtraAssertions):
+
+        def setUp(self):
+            self.tdict = TwoWayOrderedDict([('a', 1), ('b', 'b'), ('c', 3)])
+            self.value = 1
+
+            # Hold the expected dict for each test case. Used on tearDown
+            self.expected_dict = {}
+
+        def test_set_item_key_not_exist(self):
+            self.tdict['d'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('b', 'b'), ('c', 3), ('d', 1)])
+
+            self.expected_dict = {'b': 'b', 'c': 3, 3: 'c', 'd': 1, 1: 'd'}
+
+        def test_set_item_key_exist_as_key(self):
+            self.tdict['c'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('b', 'b'), ('c', 1)])
+
+            self.expected_dict = {'b': 'b', 'c': 1, 1: 'c'}
+
+        def test_set_item_key_exist_as_value(self):
+            self.tdict[1] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('b', 'b'), ('c', 3), (1, 1)])
+
+            self.expected_dict = {'b': 'b', 'c': 3, 3: 'c', 1: 1}
+
+        def test_set_item_key_exist_as_both(self):
+            self.tdict['b'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('b', 1), ('c', 3)])
+
+            self.expected_dict = {'b': 1, 1: 'b', 'c': 3, 3: 'c'}
+
+
+    class TestValueExistAsBoth(unittest.TestCase, ExtraAssertions):
+
+        def setUp(self):
+            self.tdict = TwoWayOrderedDict([('a', 1), ('b', 'b'), ('c', 3)])
+            self.value = 'b'
+
+            # Hold the expected dict for each test case. Used on tearDown
+            self.expected_dict = {}
+
+        def test_set_item_key_not_exist(self):
+            self.tdict['d'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('a', 1), ('c', 3), ('d', 'b')])
+
+            self.expected_dict = {'a': 1, 1: 'a', 'c': 3, 3: 'c', 'd': 'b', 'b': 'd'}
+
+        def test_set_item_key_exist_as_key(self):
+            self.tdict['a'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('a', 'b'), ('c', 3)])
+
+            self.expected_dict = {'a': 'b', 'b': 'a', 'c': 3, 3: 'c'}
+
+        def test_set_item_key_exist_as_value(self):
+            self.tdict[1] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('c', 3), (1, 'b')])
+
+            self.expected_dict = {'c': 3, 3: 'c', 1: 'b', 'b': 1}
+
+        def test_set_item_key_exist_as_both(self):
+            self.tdict['b'] = self.value
+            self.assertViewEqualO(self.tdict.items(), [('a', 1), ('b', 'b'), ('c', 3)])
+
+            self.expected_dict = {'a': 1, 1: 'a', 'b': 'b', 'c': 3, 3: 'c'}
+
+
+    def __init__(self):
+        super(TestSetItem, self).__init__()
+        test_loader = unittest.TestLoader()
+
+        test_cases = [
+            self.TestValueNotExist,
+            self.TestValueExistAsKey,
+            self.TestValueExistAsValue,
+            self.TestValueExistAsBoth
+        ]
+
+        for test_case in test_cases:
+            # Overwrite the tearDown method for each test case
+            test_case.tearDown = self.tearDownForTestCases
+
+            tests = test_loader.loadTestsFromTestCase(test_case)
+            self.addTests(tests)
+
+        assert self.countTestCases() == 16
+
+    @staticmethod
+    def tearDownForTestCases(test_case):
+        """Test the status of the parent dictionary."""
+        current_dict = super_call(test_case.tdict, "copy")
+        expected_dict = test_case.expected_dict
+
+        test_case.assertEqual(current_dict, expected_dict)
 
 
 class TestDelItem(unittest.TestCase, ExtraAssertions):
@@ -432,8 +579,51 @@ class TestDictItemsView(unittest.TestCase):
         self.assertEqual(repr(self.items_view), "dict_items([('a', 1), ('b', 2)])")
 
 
+def all_tests_suite():
+    """Return a test suite with all TestCases - TestSuites in this module."""
+    test_cases_list = [
+        TestInit,
+        TestGetItem,
+        TestDelItem,
+        TestLength,
+        TestIteration,
+        TestComparison,
+        TestGetValuesAndKeys,
+        TestPopMethods,
+        TestUpdate,
+        TestSetDefault,
+        TestCopy,
+        TestClear,
+        TestOldMethods,
+        TestDictKeysView,
+        TestDictValuesView,
+        TestDictItemsView
+    ]
+
+    test_suites_list = [
+        TestSetItem
+    ]
+
+
+    suite = unittest.TestSuite()
+    loader = unittest.TestLoader()
+
+    for test_case in test_cases_list:
+        tests = loader.loadTestsFromTestCase(test_case)
+        suite.addTest(tests)
+
+    for test_suite in test_suites_list:
+        suite.addTest(test_suite())
+
+    return suite
+
+
 def main():
-    unittest.main()
+    verbosity_lvl = 2 if "-v" in sys.argv else 1
+    failfast_status = True if "-f" in sys.argv else False
+
+    runner = unittest.TextTestRunner(verbosity=verbosity_lvl, failfast=failfast_status)
+    runner.run(all_tests_suite())
 
 
 if __name__ == "__main__":
