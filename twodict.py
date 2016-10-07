@@ -10,7 +10,7 @@ import collections
 
 __all__ = ["TwoWayOrderedDict"]
 
-__version__ = 1.0
+__version__ = "1.1"
 
 __license__ = "Unlicense"
 
