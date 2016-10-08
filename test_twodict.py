@@ -462,6 +462,8 @@ class TestClear(unittest.TestCase):
         self.assertEqual(len(tdict), 0)
 
 
+@unittest.skipIf(sys.version_info >= (3, 0) or sys.version_info < (2, 2),
+                 "Current Python version does not support this methods")
 class TestOldMethods(unittest.TestCase):
 
     """Contains test cases for the deprecated methods.
@@ -478,6 +480,9 @@ class TestOldMethods(unittest.TestCase):
         viewkeys(): Replaced by keys().
 
         viewvalues(): Replaced by values().
+
+    Note:
+        In Python 3.* those methods are not available.
 
     """
 

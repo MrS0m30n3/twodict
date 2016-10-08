@@ -5,6 +5,7 @@ Attributes:
 
 """
 
+import sys
 import collections
 
 
@@ -267,4 +268,5 @@ class TwoWayOrderedDict(dict):
     def __not_implemented():
         raise NotImplementedError("Please use the equivalent items(), keys(), values() methods")
 
-    iteritems = iterkeys = itervalues = viewitems = viewkeys = viewvalues = __not_implemented
+    if sys.version_info < (3, 0) and sys.version_info >= (2, 2):
+        iteritems = iterkeys = itervalues = viewitems = viewkeys = viewvalues = __not_implemented
