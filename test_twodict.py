@@ -363,7 +363,7 @@ class TestGetValuesAndKeys(unittest.TestCase, ExtraAssertions):
         self.assertViewEqualO(self.tdict.values(), [1, 2, 3])
 
 
-class TestPopMethods(unittest.TestCase):
+class TestPopMethods(unittest.TestCase, ExtraAssertions):
 
     """Test case for the TwoWayOrderedDict pop() & popitem() methods."""
 
@@ -372,9 +372,11 @@ class TestPopMethods(unittest.TestCase):
 
     def test_pop_by_key(self):
         self.assertEqual(self.tdict.pop('a'), 1)
+        self.assertViewEqualO(self.tdict.items(), [('b', 2), ('c', 3)])
 
     def test_pop_by_value(self):
         self.assertEqual(self.tdict.pop(1), 'a')
+        self.assertViewEqualO(self.tdict.items(), [('b', 2), ('c', 3)])
 
     def test_pop_raises(self):
         self.assertRaises(KeyError, self.tdict.pop, 'd')
@@ -384,9 +386,11 @@ class TestPopMethods(unittest.TestCase):
 
     def test_popitem_last(self):
         self.assertEqual(self.tdict.popitem(), ('c', 3))
+        self.assertViewEqualO(self.tdict.items(), [('a', 1), ('b', 2)])
 
     def test_popitem_first(self):
         self.assertEqual(self.tdict.popitem(last=False), ('a', 1))
+        self.assertViewEqualO(self.tdict.items(), [('b', 2), ('c', 3)])
 
     def test_popitem_raises(self):
         while self.tdict: self.tdict.popitem()
