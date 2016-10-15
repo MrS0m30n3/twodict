@@ -11,7 +11,7 @@ import collections
 
 __all__ = ["TwoWayOrderedDict"]
 
-__version__ = "1.1"
+__version__ = "1.2"
 
 __license__ = "Unlicense"
 
