@@ -6,8 +6,8 @@ See [wiki](https://github.com/MrS0m30n3/twodict/wiki) for more informations.
 # INSTALLATION
 
 ### Install From Source
-1. Download & extract source from [here](https://github.com/MrS0m30n3/twodict/archive/1.1.zip)
-2. Change directory into **twodict-1.1/**
+1. Download & extract source from [here](https://github.com/MrS0m30n3/twodict/archive/1.2.zip)
+2. Change directory into **twodict-1.2/**
 3. Run `sudo python setup.py install`
 
 ### Install From [Pypi](https://pypi.python.org/pypi/twodict)
