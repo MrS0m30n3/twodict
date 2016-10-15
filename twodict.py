@@ -237,7 +237,7 @@ class TwoWayOrderedDict(dict):
             raise TypeError("expected at most 1 arguments, got {0}".format(len(args)))
 
         for item in args:
-            if type(item) == dict:
+            if isinstance(item, dict):
                 item = item.items()
 
             for key, value in item:

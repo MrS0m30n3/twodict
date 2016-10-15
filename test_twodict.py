@@ -416,6 +416,11 @@ class TestUpdate(unittest.TestCase, ExtraAssertions):
     def test_update_raises(self):
         self.assertRaises(TypeError, self.tdict.update, [('a', 10)], [('b', 20)])
 
+    def test_update_from_other(self):
+        other = TwoWayOrderedDict([('a', 10), ('b', 20), ('c', 30)])
+        self.tdict.update(other)
+        self.assertViewEqualO(self.tdict.items(), [('a', 10), ('b', 20), ('c', 30)])
+
 
 class TestSetDefault(unittest.TestCase, ExtraAssertions):
 
