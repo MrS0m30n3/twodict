@@ -65,7 +65,7 @@ class DictItemsView(collections.ItemsView):
 
 class TwoWayOrderedDict(dict):
 
-    """Custom data structure which implements a two way ordrered dictionary.
+    """Custom data structure which implements a two way ordered dictionary.
 
     Custom dictionary that supports key:value relationships AND value:key
     relationships. It also remembers the order in which the items were inserted
