@@ -1,7 +1,7 @@
 # twodict (Two Way Ordered Dict)
 Simple two way ordered dictionary for Python.
 
-See [wiki](https://github.com/MrS0m30n3/twodict/wiki) for more informations.
+See [wiki](https://github.com/MrS0m30n3/twodict/wiki) for more information.
 
 # INSTALLATION
 
